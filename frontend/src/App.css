@@ -1,0 +1,84 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.fancy-link {
+  position: relative;
+  text-decoration:none;
+  color: #c71586;
+  transition: color 0.3s ease;
+}
+
+.fancy-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1pt;
+  background-color: #4b4649;
+  transition: color 0.3s ease-in;
+}
+
+.fancy-link:hover {
+  color: #fb0881;
+}
+
+.fancy-link:hover::after {
+  color: #fb0881;
+}
+
+@media (max-width: 100px) {
+  nav, .stringall, .intro, .rightmostlinks {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .fancy-link {
+    margin: 0.5rem 0;
+  }
+}
+
+@keyframes blink {
+  from, to { border-color: transparent }
+  50% { border-color: black }
+}
+@media (max-width: 900px) {
+    .myimage {
+        width: 50%;
+    }
+}
