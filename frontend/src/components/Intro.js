@@ -62,34 +62,52 @@ function Cue() {
     );
 }
 
+
+
+export default function Intro() {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkScreenSize = () => {
+            setIsMobile(window.innerWidth <= 600);
+        };
+        
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
+        
+        return () => window.removeEventListener('resize', checkScreenSize);
+    }, []);
+
+    const styles = {
+        intro: {
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '5% 25% 5% 25%'
+        }
+    }
+
+    return (
+        <div className='intro' style={styles.intro}>
+            <Cue /><ProcessMyImage />
+        </div>
+    );
+}
+
 const style = {
     myImage: {
-        position: 'relative',
+        //position: 'relative',
         width: '250px',
         border: '4px solid #c71585',
         borderRadius: '8px',
         boxShadow: '8px 8px 0px rgba(0, 0, 0, 0.6)'
     },
     cue: {
-        position: 'relative',
+        //position: 'relative',
         fontSize: '25pt',
         verticalAlign: 'middle',
         flex: '1'
     },
-    intro: {
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '5% 25% 5% 25%'
-    }
-}
-
-export default function Intro() {
-    return (
-        <div class='intro' style={style.intro}>
-            <Cue /><ProcessMyImage />
-        </div>
-    );
 }

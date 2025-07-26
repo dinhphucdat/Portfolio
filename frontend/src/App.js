@@ -12,6 +12,7 @@ function App() {
           <Route path='/' element={<Home />}/>
           <Route path='/header' element={<Header />} />
           <Route path='/#aboutme' element={<Home />} />
+          <Route path='/#emailme' element={<Home />} />
         </Routes>
       </BrowserRouter>
     </div>

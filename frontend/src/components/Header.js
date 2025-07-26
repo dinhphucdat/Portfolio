@@ -53,9 +53,13 @@ function StringAll() {
 
 // Function to handle header click - navigate to home then scroll to About Me
 function HeaderLink() {
+    const headers = ['About Me', 'Contact'];
+
+    const headersBind = ['about-me-section', 'email-me-section'];
+
     const navigate = useNavigate();
     
-    const handleClick = (e) => {
+    const handleClick = (e, index) => {
         e.preventDefault();
         
         // Navigate to home page
@@ -63,7 +67,7 @@ function HeaderLink() {
         
         // Wait for navigation to complete, then scroll to about section
         setTimeout(() => {
-            const aboutSection = document.getElementById('about-me-section');
+            const aboutSection = document.getElementById(headersBind[index]);
             if (aboutSection) {
                 aboutSection.scrollIntoView({ 
                     behavior: 'smooth',
@@ -74,14 +78,20 @@ function HeaderLink() {
     };
     
     return (
-        <a 
-            href="/" 
-            className='fancy-link' 
-            style={style.link}
-            onClick={handleClick}
-        >
-            About Me
-        </a>
+        headers.map((hdname, index) => {
+            return (
+                <a 
+                key={index}
+                href="/" 
+                className='fancy-link' 
+                style={style.link}
+                onClick={(e) => handleClick(e, index)}
+                >
+                    {hdname}
+                </a>
+            );
+        })
+        
     );
 }
 

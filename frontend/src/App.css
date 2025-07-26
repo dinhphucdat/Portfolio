@@ -62,7 +62,7 @@
   color: #fb0881;
 }
 
-@media (max-width: 100px) {
+@media (max-width: 600px) {
   nav, .stringall, .intro, .rightmostlinks {
     flex-direction: column;
     align-items: center;
