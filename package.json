@@ -1,0 +1,5 @@
+{
+    "scripts": {
+    "deploy": "cd frontend && npm run deploy"
+    }
+}
