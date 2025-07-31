@@ -1,18 +1,20 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 
-export default function EmailMe({id}) {
-    const [formData, setFormData] = useState(
-        {
-            name: '', email: '', subject: '', message: ''
-        }
-    );
+export default function EmailMe({ id }) {
+    const [formData, setFormData] = useState({
+        name: '', 
+        email: '', 
+        subject: '', 
+        message: ''
+    });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState('');
     const [isMobile, setIsMobile] = useState(false);
+    const [focusedField, setFocusedField] = useState(null);
 
     useEffect(() => {
         const checkScreenSize = () => {
-            setIsMobile(window.innerWidth <= 600);
+            setIsMobile(window.innerWidth <= 768);
         };
     
         checkScreenSize();
@@ -22,52 +24,100 @@ export default function EmailMe({id}) {
     }, []);
 
     const handleInputChange = (e) => {
-        const {name, value} = e.target;
-        
-            setFormData(prev => ({
-                ...prev, [name]: value
-            }));
-        
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev, 
+            [name]: value
+        }));
     };
 
-    const handleSubmit = () => {
+    const handleFocus = (fieldName) => {
+        setFocusedField(fieldName);
+    };
+
+    const handleBlur = () => {
+        setFocusedField(null);
+    };
+
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        if (!isFormValid) return;
+
         setIsSubmitting(true);
+        setSubmitStatus('');
 
-        // create mailto link
-        const subject = encodeURIComponent(formData.subject || 'Contact from Portfolio');
-        const body = encodeURIComponent(
-            `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-        );
-        const mailtoLink = `mailto:dinhphucdat005@gmail.com?subject=${subject}&body=${body}`;
+        try {
+            // Create mailto link
+            const subject = encodeURIComponent(formData.subject || 'Contact from Portfolio');
+            const body = encodeURIComponent(
+                `Hi Dat,\n\nName: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}\n\nBest regards,\n${formData.name}`
+            );
+            const mailtoLink = `mailto:dinhphucdat005@gmail.com?subject=${subject}&body=${body}`;
 
-        // open email client
-        window.location.href = mailtoLink;
+            // Open email client
+            window.open(mailtoLink, '_self');
 
-        // Show success message
-        setSubmitStatus('Email client opened! Thank you for reaching out.');
+            // Show success message
+            setSubmitStatus('Email client opened! Thank you for reaching out.');
 
-        // Reset form after a delay
-        setTimeout(() => {
-            setFormData({ name: '', email: '', subject: '', message: '' });
-            setSubmitStatus('');
+            // Reset form after a delay
+            setTimeout(() => {
+                setFormData({ name: '', email: '', subject: '', message: '' });
+                setSubmitStatus('');
+                setIsSubmitting(false);
+            }, 3000);
+        } catch (error) {
+            setSubmitStatus('Something went wrong. Please try again or email me directly.');
             setIsSubmitting(false);
-        }, 3000);
+        }
     };
+
+    // Copy email to clipboard
+    const copyEmail = async () => {
+        try {
+            await navigator.clipboard.writeText('dinhphucdat005@gmail.com');
+            setSubmitStatus('Email copied to clipboard!');
+            setTimeout(() => setSubmitStatus(''), 2000);
+        } catch (err) {
+            console.log('Failed to copy email');
+        }
+    };
+
+    const getInputStyle = (fieldName, hasError = false) => ({
+        ...styles.input,
+        borderColor: hasError ? '#dc3545' : 
+                    focusedField === fieldName ? '#c71585' : '#e9ecef',
+        boxShadow: focusedField === fieldName ? '0 0 0 3px rgba(199, 21, 133, 0.1)' : 'none'
+    });
+
+    const getTextareaStyle = (fieldName, hasError = false) => ({
+        ...styles.textarea,
+        borderColor: hasError ? '#dc3545' : 
+                    focusedField === fieldName ? '#c71585' : '#e9ecef',
+        boxShadow: focusedField === fieldName ? '0 0 0 3px rgba(199, 21, 133, 0.1)' : 'none'
+    });
 
     const styles = {
         container: {
             minHeight: '100vh',
             backgroundColor: '#f8f9fa',
-            fontFamily: '"Open Sans", sans-serif'
+            fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
         },
         header: {
             color: 'white',
             backgroundColor: '#c71585',
-            fontSize: '1.8rem',
+            fontSize: 'clamp(1.5rem, 4vw, 2rem)',
             textAlign: 'center',
-            padding: '1rem 0',
+            padding: '1.5rem 0',
             marginBottom: '2rem',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            boxShadow: '0 4px 12px rgba(199, 21, 133, 0.3)',
+            background: 'linear-gradient(135deg, #c71585, #e91e63)'
         },
         contentContainer: {
             maxWidth: '1200px',
@@ -79,22 +129,27 @@ export default function EmailMe({id}) {
             marginBottom: '3rem'
         },
         introTitle: {
-            fontSize: '2.2rem',
-            fontWeight: '600',
+            fontSize: 'clamp(1.8rem, 5vw, 2.5rem)',
+            fontWeight: '700',
             color: '#c71585',
-            marginBottom: '1rem'
+            marginBottom: '1rem',
+            background: 'linear-gradient(135deg, #c71585, #e91e63)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
         },
         introText: {
-            fontSize: '1.1rem',
+            fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
             color: '#555',
             lineHeight: '1.6',
-            maxWidth: '600px',
+            maxWidth: '700px',
             margin: '0 auto'
         },
         contactSection: {
             display: 'grid',
             gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-            gap: '2rem'
+            gap: '2rem',
+            alignItems: 'start'
         },
         directContact: {
             display: 'flex',
@@ -102,11 +157,12 @@ export default function EmailMe({id}) {
         },
         contactFrame: {
             backgroundColor: 'white',
-            border: '4px solid #c71585',
-            borderRadius: '12px',
+            border: '3px solid #c71585',
+            borderRadius: '16px',
             padding: '2rem',
-            boxShadow: '8px 8px 0px rgba(199, 21, 133, 0.2)',
-            height: 'fit-content'
+            boxShadow: '12px 12px 0px rgba(199, 21, 133, 0.15)',
+            height: 'fit-content',
+            transition: 'transform 0.3s ease, box-shadow 0.3s ease'
         },
         contactTitle: {
             fontSize: '1.5rem',
@@ -124,19 +180,23 @@ export default function EmailMe({id}) {
             display: 'flex',
             alignItems: 'center',
             gap: '0.75rem',
-            padding: '0.75rem',
+            padding: '1rem',
             backgroundColor: '#f8f9fa',
-            borderRadius: '8px',
-            border: '2px solid #e9ecef'
+            borderRadius: '12px',
+            border: '2px solid #e9ecef',
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
         },
         contactIcon: {
-            fontSize: '1.5rem'
+            fontSize: '1.5rem',
+            minWidth: '24px'
         },
         contactLink: {
             color: '#c71585',
             textDecoration: 'none',
             fontWeight: '500',
-            fontSize: '1rem'
+            fontSize: '1rem',
+            transition: 'color 0.3s ease'
         },
         contactText: {
             color: '#555',
@@ -148,10 +208,11 @@ export default function EmailMe({id}) {
         },
         formFrame: {
             backgroundColor: 'white',
-            border: '4px solid #c71585',
-            borderRadius: '12px',
+            border: '3px solid #c71585',
+            borderRadius: '16px',
             padding: '2rem',
-            boxShadow: '8px 8px 0px rgba(199, 21, 133, 0.2)'
+            boxShadow: '12px 12px 0px rgba(199, 21, 133, 0.15)',
+            transition: 'transform 0.3s ease, box-shadow 0.3s ease'
         },
         formTitle: {
             fontSize: '1.5rem',
@@ -163,62 +224,76 @@ export default function EmailMe({id}) {
         form: {
             display: 'flex',
             flexDirection: 'column',
-            gap: '1rem'
+            gap: '1.5rem'
         },
         inputGroup: {
             display: 'flex',
             flexDirection: 'column'
         },
         label: {
-            fontSize: '0.9rem',
+            fontSize: '0.95rem',
             fontWeight: '600',
             color: '#333',
             marginBottom: '0.5rem'
         },
         input: {
-            padding: '0.75rem',
+            padding: '1rem',
             border: '2px solid #e9ecef',
-            borderRadius: '8px',
+            borderRadius: '12px',
             fontSize: '1rem',
-            fontFamily: '"Open Sans", sans-serif',
-            transition: 'border-color 0.3s ease',
+            fontFamily: 'inherit',
+            transition: 'all 0.3s ease',
             outline: 'none'
         },
         textarea: {
-            padding: '0.75rem',
+            padding: '1rem',
             border: '2px solid #e9ecef',
-            borderRadius: '8px',
+            borderRadius: '12px',
             fontSize: '1rem',
-            fontFamily: '"Open Sans", sans-serif',
-            transition: 'border-color 0.3s ease',
+            fontFamily: 'inherit',
+            transition: 'all 0.3s ease',
             outline: 'none',
             resize: 'vertical',
-            minHeight: '120px'
+            minHeight: '140px'
         },
         submitButton: {
             backgroundColor: '#c71585',
             color: 'white',
             border: 'none',
-            borderRadius: '8px',
+            borderRadius: '12px',
             padding: '1rem 2rem',
             fontSize: '1.1rem',
             fontWeight: '600',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
-            marginTop: '1rem'
+            marginTop: '1rem',
+            background: 'linear-gradient(135deg, #c71585, #e91e63)',
+            boxShadow: '0 4px 12px rgba(199, 21, 133, 0.3)'
         },
         submitButtonDisabled: {
-            backgroundColor: '#ccc',
-            cursor: 'not-allowed'
+            background: '#ccc',
+            cursor: 'not-allowed',
+            boxShadow: 'none'
         },
         statusMessage: {
             backgroundColor: '#d4edda',
             color: '#155724',
-            padding: '0.75rem',
-            borderRadius: '8px',
+            padding: '1rem',
+            borderRadius: '12px',
             border: '1px solid #c3e6cb',
             marginBottom: '1rem',
-            textAlign: 'center'
+            textAlign: 'center',
+            fontSize: '0.95rem'
+        },
+        errorMessage: {
+            backgroundColor: '#f8d7da',
+            color: '#721c24',
+            padding: '1rem',
+            borderRadius: '12px',
+            border: '1px solid #f5c6cb',
+            marginBottom: '1rem',
+            textAlign: 'center',
+            fontSize: '0.95rem'
         },
         formNote: {
             fontSize: '0.85rem',
@@ -226,45 +301,77 @@ export default function EmailMe({id}) {
             textAlign: 'center',
             marginTop: '1rem',
             fontStyle: 'italic'
+        },
+        copyButton: {
+            background: 'none',
+            border: 'none',
+            color: '#c71585',
+            cursor: 'pointer',
+            fontSize: '0.85rem',
+            textDecoration: 'underline',
+            marginLeft: '0.5rem'
         }
     };
 
-    const isFormValid = formData.name && formData.email && formData.message;
+    // Form validation
+    const isFormValid = formData.name.trim() && 
+                       formData.email.trim() && 
+                       validateEmail(formData.email) && 
+                       formData.message.trim();
+
+    const emailError = formData.email && !validateEmail(formData.email);
 
     return (
         <div style={styles.container} id={id}>
             <div style={styles.header}>
-                Email Me
+                📧 Get In Touch
             </div>
             
             <div style={styles.contentContainer}>
                 <div style={styles.introSection}>
                     <h2 style={styles.introTitle}>Let's Connect!</h2>
                     <p style={styles.introText}>
-                        I'm always interested in discussing new opportunities, collaborations, 
-                        or just having a conversation about technology and innovation. 
-                        Feel free to reach out!
+                        I'm always excited to discuss new opportunities, collaborate on interesting projects, 
+                        or simply chat about technology and innovation. Don't hesitate to reach out!
                     </p>
                 </div>
 
-                <div style={styles.contactSection} className="contact-section">
+                <div style={styles.contactSection}>
                     <div style={styles.directContact}>
                         <div style={styles.contactFrame}>
-                            <h3 style={styles.contactTitle}>Quick Contact</h3>
+                            <h3 style={styles.contactTitle}>Direct Contact</h3>
                             <div style={styles.contactInfo}>
-                                <div style={styles.contactItem}>
+                                <div 
+                                    style={{
+                                        ...styles.contactItem,
+                                        ':hover': { backgroundColor: '#e3f2fd' }
+                                    }}
+                                    onClick={copyEmail}
+                                    title="Click to copy email"
+                                >
                                     <span style={styles.contactIcon}>📧</span>
                                     <a href="mailto:dinhphucdat005@gmail.com" style={styles.contactLink}>
                                         dinhphucdat005@gmail.com
                                     </a>
+                                    <button style={styles.copyButton} onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        copyEmail();
+                                    }}>
+                                        📋
+                                    </button>
                                 </div>
                                 <div style={styles.contactItem}>
-                                    <span style={styles.contactIcon}>📱</span>
-                                    <span style={styles.contactText}>Available for remote opportunities</span>
+                                    <span style={styles.contactIcon}>💼</span>
+                                    <span style={styles.contactText}>Open to remote opportunities</span>
                                 </div>
                                 <div style={styles.contactItem}>
-                                    <span style={styles.contactIcon}>🌍</span>
-                                    <span style={styles.contactText}>Based in Saint Paul, MN</span>
+                                    <span style={styles.contactIcon}>📍</span>
+                                    <span style={styles.contactText}>Saint Paul, Minnesota</span>
+                                </div>
+                                <div style={styles.contactItem}>
+                                    <span style={styles.contactIcon}>⚡</span>
+                                    <span style={styles.contactText}>Usually responds within 24 hours</span>
                                 </div>
                             </div>
                         </div>
@@ -275,7 +382,11 @@ export default function EmailMe({id}) {
                             <h3 style={styles.formTitle}>Send a Message</h3>
                             
                             {submitStatus && (
-                                <div style={styles.statusMessage}>
+                                <div style={
+                                    submitStatus.includes('wrong') || submitStatus.includes('error') 
+                                        ? styles.errorMessage 
+                                        : styles.statusMessage
+                                }>
                                     {submitStatus}
                                 </div>
                             )}
@@ -288,7 +399,9 @@ export default function EmailMe({id}) {
                                         name="name"
                                         value={formData.name}
                                         onChange={handleInputChange}
-                                        style={styles.input}
+                                        onFocus={() => handleFocus('name')}
+                                        onBlur={handleBlur}
+                                        style={getInputStyle('name')}
                                         placeholder="Your full name"
                                         required
                                     />
@@ -301,10 +414,17 @@ export default function EmailMe({id}) {
                                         name="email"
                                         value={formData.email}
                                         onChange={handleInputChange}
-                                        style={styles.input}
+                                        onFocus={() => handleFocus('email')}
+                                        onBlur={handleBlur}
+                                        style={getInputStyle('email', emailError)}
                                         placeholder="your.email@example.com"
                                         required
                                     />
+                                    {emailError && (
+                                        <span style={{ color: '#dc3545', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                                            Please enter a valid email address
+                                        </span>
+                                    )}
                                 </div>
 
                                 <div style={styles.inputGroup}>
@@ -314,7 +434,9 @@ export default function EmailMe({id}) {
                                         name="subject"
                                         value={formData.subject}
                                         onChange={handleInputChange}
-                                        style={styles.input}
+                                        onFocus={() => handleFocus('subject')}
+                                        onBlur={handleBlur}
+                                        style={getInputStyle('subject')}
                                         placeholder="What's this about?"
                                     />
                                 </div>
@@ -325,27 +447,34 @@ export default function EmailMe({id}) {
                                         name="message"
                                         value={formData.message}
                                         onChange={handleInputChange}
-                                        style={styles.textarea}
-                                        placeholder="Tell me about your project, opportunity, or just say hello!"
+                                        onFocus={() => handleFocus('message')}
+                                        onBlur={handleBlur}
+                                        style={getTextareaStyle('message')}
+                                        placeholder="Tell me about your project, opportunity, or just say hello! I'd love to hear from you."
                                         rows="5"
                                         required
                                     />
                                 </div>
 
                                 <button
-                                    onClick={handleSubmit}
+                                    type="submit"
                                     disabled={!isFormValid || isSubmitting}
                                     style={{
                                         ...styles.submitButton,
-                                        ...((!isFormValid || isSubmitting) ? styles.submitButtonDisabled : {})
+                                        ...((!isFormValid || isSubmitting) ? styles.submitButtonDisabled : {}),
+                                        ':hover': !isFormValid || isSubmitting ? {} : {
+                                            transform: 'translateY(-2px)',
+                                            boxShadow: '0 6px 16px rgba(199, 21, 133, 0.4)'
+                                        }
                                     }}
                                 >
-                                    {isSubmitting ? '📧 Opening Email...' : '📧 Send Message'}
+                                    {isSubmitting ? '📧 Opening Email Client...' : '📧 Send Message'}
                                 </button>
                             </div>
 
                             <p style={styles.formNote}>
-                                * This will open your default email client with the message pre-filled
+                                💡 This will open your default email client with the message pre-filled. 
+                                Make sure you have an email client configured!
                             </p>
                         </div>
                     </div>
@@ -353,5 +482,4 @@ export default function EmailMe({id}) {
             </div>
         </div>
     );
-};
-
+}
