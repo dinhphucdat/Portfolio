@@ -77,8 +77,3 @@
   from, to { border-color: transparent }
   50% { border-color: black }
 }
-@media (max-width: 900px) {
-    .myimage {
-        width: 50%;
-    }
-}

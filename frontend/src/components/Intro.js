@@ -103,10 +103,9 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '5% 10%',
-        minHeight: '60vh',
+        padding: '10% 20%',
         gap: '2rem',
-        maxWidth: '1200px',
+        maxWidth: '90vw',
         margin: '0 auto'
     },
     textSection: {
@@ -118,7 +117,7 @@ const styles = {
     },
     myImage: {
         width: '250px',
-        height: '250px',
+        height: '350px',
         objectFit: 'cover',
         border: '4px solid #c71585',
         borderRadius: '12px',
